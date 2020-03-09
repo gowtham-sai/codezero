@@ -30,6 +30,13 @@ type (
 )
 
 func Register(parserType Type, parser Parser) (err error) {
+	return p.register(parserType, parser)
+}
+
+func (p *Registry) register(parserType Type, parser Parser) (err error) {
+	p.lock.Lock()
+	defer p.lock.Unlock()
+
 	for pt := range p.parsers {
 		if pt == parserType {
 			return parserAlreadyRegister
@@ -39,12 +46,12 @@ func Register(parserType Type, parser Parser) (err error) {
 	return
 }
 
-func (p *registry) ParseSpec(spec Spec) (dep deps.Dependency, err error) {
-	return
+func ParseSpec(spec Spec) (dep deps.Dependency, err error) {
+	return p.parseSpec(spec)
 }
 
-func NewRegistry() (registry *Registry) {
-	return p
+func (p *Registry) parseSpec(spec Spec) (dep deps.Dependency, err error) {
+	return
 }
 
 func init() {
