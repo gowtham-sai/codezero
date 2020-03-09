@@ -7,46 +7,48 @@ import (
 	"codezero/deps"
 )
 
-type registry map[parserType]Parser
+type registry map[Type]Parser
 
 var (
-	p *parserRegistry
+	p *Registry
 
 	parserAlreadyRegister = errors.New("parser_already_registered")
 )
 
-type spec string
-type parserType string
+type (
+	Spec string
+	Type string
 
-type Parser interface {
-	ParseSpec(spec spec) (dep deps.Dependency, err error)
-}
+	Parser interface {
+		ParseSpec(spec Spec) (dep deps.Dependency, err error)
+	}
 
-type parserRegistry struct {
-	lock              sync.Mutex
-	registeredParsers registry
-}
+	Registry struct {
+		lock    sync.Mutex
+		parsers registry
+	}
+)
 
-func registerParser(parserType parserType, parser Parser) (err error) {
-	for pt := range p.registeredParsers {
+func Register(parserType Type, parser Parser) (err error) {
+	for pt := range p.parsers {
 		if pt == parserType {
 			return parserAlreadyRegister
 		}
 	}
-	p.registeredParsers[parserType] = parser
+	p.parsers[parserType] = parser
 	return
 }
 
-func (p *registry) ParseSpec(spec spec) (dep deps.Dependency, err error) {
+func (p *registry) ParseSpec(spec Spec) (dep deps.Dependency, err error) {
 	return
 }
 
-func NewParser() (parserRegistry *parserRegistry) {
+func NewRegistry() (registry *Registry) {
 	return p
 }
 
 func init() {
-	p = &parserRegistry{
-		registeredParsers: make(registry),
+	p = &Registry{
+		parsers: make(registry),
 	}
 }
