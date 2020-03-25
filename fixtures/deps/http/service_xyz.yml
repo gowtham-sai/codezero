@@ -1,0 +1,15 @@
+voucher_service:
+  situations:
+    response_2xx:
+      req:
+        method: GET
+        path: /v1/ping
+        query:
+         waypoints: 102.6123,-6.1235|102.113,-6.2343
+        headers:
+          Accept-Encoding:
+            - gzip
+            - compress
+      res:
+        body: |
+          {"ping": "pong"}
