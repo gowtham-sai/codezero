@@ -56,3 +56,8 @@ type (
 		Sits Situations `yaml:"situations"`
 	}
 )
+
+func (s Situation) StartSituation() {
+
+}
+
