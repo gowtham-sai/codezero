@@ -24,11 +24,14 @@ func TestShouldStartSituation(t *testing.T) {
 			Headers: Header{"Accept-Encoding": []string{"gzip", "compress"}},
 		},
 		Res: Response{
-			Body: fmt.Sprintf("%s\n", `{"ping": "pong"}`),
+			StatusCode: http.StatusAccepted,
+			Body:       fmt.Sprintf("%s\n", `{"ping": "pong"}`),
+			Headers:    Header{"Accept-Encoding": []string{"application/json", "gzip"}},
 		},
 	}
 	spec := Spec{Port: 8010}
 	situation.StartSituation(spec)
+	defer situation.StopSituation()
 
 	req, err := http.NewRequest(string(Get), fmt.Sprintf("http://localhost:%d/v1/ping", spec.Port), nil)
 	require.NoError(t, err)
@@ -40,5 +43,7 @@ func TestShouldStartSituation(t *testing.T) {
 	respBytes, err := ioutil.ReadAll(resp.Body)
 	require.NoError(t, err)
 
-	assert.Equal(t, string(respBytes), `{"ping": "pong"}`)
+	assert.Equal(t, http.StatusAccepted, resp.StatusCode)
+	assert.Equal(t, situation.Res.Headers["Accept-Encoding"], resp.Header["Accept-Encoding"])
+	assert.Equal(t, string(respBytes), fmt.Sprintf("%s\n", `{"ping": "pong"}`))
 }
