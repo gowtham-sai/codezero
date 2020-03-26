@@ -55,9 +55,12 @@ type (
 	Dependency struct {
 		Sits Situations `yaml:"situations"`
 	}
+
+	Spec struct {
+		Port int `yaml:"port"`
+	}
 )
 
-func (s Situation) StartSituation() {
-
+func (s *Situation) StartSituation(spec Spec) {
 }
 

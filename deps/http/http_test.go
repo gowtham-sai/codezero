@@ -19,12 +19,13 @@ func TestShouldStartSituation(t *testing.T) {
 			Headers: Header{"Accept-Encoding": []string{"gzip", "compress"}},
 		},
 		Res: Response{
-			Body: fmt.Sprintf("%s\n",`{"ping": "pong"}`),
+			Body: fmt.Sprintf("%s\n", `{"ping": "pong"}`),
 		},
 	}
-	situation.StartSituation()
+	spec := Spec{Port: 8010}
+	situation.StartSituation(spec)
 
-	req, err := http.NewRequest(string(Get), "http://localhost:8010/v1/ping", nil)
+	req, err := http.NewRequest(string(Get), fmt.Sprintf("http://localhost:%d/v1/ping", spec.Port), nil)
 	require.NoError(t, err)
 
 	resp, err := http.DefaultClient.Do(req)
