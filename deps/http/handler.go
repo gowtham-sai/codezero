@@ -16,6 +16,10 @@ type (
 	Dependencies map[ServiceName]Dependency
 )
 
+func (h *Handler) StopSituation(spec deps.Spec) error {
+	panic("implement me")
+}
+
 func (h *Handler) StartSituation(spec deps.Spec) error {
 	panic("implement me")
 

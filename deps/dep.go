@@ -9,7 +9,8 @@ type (
 	Spec string
 
 	Handler interface {
-		StartSituation() error
+		StartSituation(spec Spec) error
+		StopSituation(spec Spec) error
 		ParseSpec(spec Spec) error
 	}
 )
