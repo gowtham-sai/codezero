@@ -8,8 +8,8 @@ import (
 	"codezero/deps"
 )
 
-func ParseSpec(spec deps.Spec) (r Handler, err error) {
-	err = yaml.Unmarshal([]byte(spec), &r)
+func ParseSpec(spec deps.Spec) (d Dependencies, err error) {
+	err = yaml.Unmarshal([]byte(spec), &d)
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 		return

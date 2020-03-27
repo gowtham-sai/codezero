@@ -19,21 +19,23 @@ func TestShouldParseSpec(t *testing.T) {
 	require.NoError(t, err, "http.ParseSpec error")
 
 	expectedHandler := Handler{
-		"voucher_service": Dependency{
-			Sits: Situations{
-				"response_2xx": Situation{
-					Req: Request{
-						Method:  Get,
-						Path:    "/v1/ping",
-						Query:   Query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
-						Headers: Header{"Accept-Encoding": []string{"gzip", "compress"}},
-					},
-					Res: Response{
-						Body: fmt.Sprintf("%s\n",`{"ping": "pong"}`),
+		Deps: map[ServiceName]Dependency{
+			"voucher_service": Dependency{
+				Sits: Situations{
+					"response_2xx": Situation{
+						Req: Request{
+							Method:  Get,
+							Path:    "/v1/ping",
+							Query:   Query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
+							Headers: Header{"Accept-Encoding": []string{"gzip", "compress"}},
+						},
+						Res: Response{
+							Body: fmt.Sprintf("%s\n", `{"ping": "pong"}`),
+						},
 					},
 				},
 			},
 		},
 	}
-	assert.Equal(t, actualHandler, expectedHandler)
+	assert.Equal(t, expectedHandler.Deps, actualHandler)
 }

@@ -19,13 +19,17 @@ const (
 )
 
 var (
-	registeredDependencies = Handler{}
+	registeredDependencies = &Handler{}
 )
 
 type (
-	ServiceName   string
+	ServiceName string
 
 	Method string
 	Header map[string][]string
 	Query  map[string]string
 )
+
+func init() {
+	deps.RegisterHandler(Type, registeredDependencies)
+}
