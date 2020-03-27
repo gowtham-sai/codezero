@@ -1,6 +1,6 @@
 service_xyz:
   situations:
-    response_2xx:
+    response_5xx:
       req:
         method: GET
         path: /v1/ping
@@ -11,5 +11,4 @@ service_xyz:
             - gzip
             - compress
       res:
-        body: |
-          {"ping": "pong"}
+        status_code: 500

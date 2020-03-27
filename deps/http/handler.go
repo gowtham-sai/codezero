@@ -30,6 +30,15 @@ func (h *Handler) ParseSpec(spec deps.Spec) (err error) {
 	if err != nil {
 		return err
 	}
-	h.Deps = d
+	for serviceName, dependency := range d {
+		for situationName, situation := range dependency.Sits {
+			if dep, found := h.Deps[serviceName]; found {
+				dep.Sits[situationName] = situation
+				h.Deps[serviceName] = dep
+			} else {
+				h.Deps[serviceName] = dependency
+			}
+		}
+	}
 	return
 }
