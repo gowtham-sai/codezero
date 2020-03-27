@@ -8,7 +8,7 @@ import (
 	"codezero/deps"
 )
 
-func ParseSpec(spec deps.Spec) (d Dependencies, err error) {
+func parseSpec(spec deps.Spec) (d Dependencies, err error) {
 	err = yaml.Unmarshal([]byte(spec), &d)
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)

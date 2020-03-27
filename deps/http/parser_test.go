@@ -15,8 +15,8 @@ func TestShouldParseSpec(t *testing.T) {
 	spec, err := ioutil.ReadFile("../../fixtures/deps/http/service_xyz.yml")
 	require.NoError(t, err, "yamlFile.Get error")
 
-	actualHandler, err := ParseSpec(deps.Spec(spec))
-	require.NoError(t, err, "http.ParseSpec error")
+	actualHandler, err := parseSpec(deps.Spec(spec))
+	require.NoError(t, err, "http.parseSpec error")
 
 	expectedHandler := Handler{
 		Deps: map[ServiceName]Dependency{
