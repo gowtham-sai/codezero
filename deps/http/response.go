@@ -25,5 +25,5 @@ func (resp *Response) StatusCode() int {
 	if resp.Code != 0 {
 		return resp.Code
 	}
-	return resp.Code
+	return http.StatusOK
 }
