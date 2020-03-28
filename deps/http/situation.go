@@ -27,10 +27,12 @@ func (s *Spec) Addr() string {
 }
 
 func (s *Situation) StartSituation(spec Spec) {
+	mux := http.NewServeMux()
 	handler := s.Res.createHandler()
-	http.HandleFunc(s.Req.Path, handler)
+	mux.HandleFunc(s.Req.Path, handler)
 	s.srv = &http.Server{
-		Addr: spec.Addr(),
+		Addr:    spec.Addr(),
+		Handler: handler,
 	}
 	go func() {
 		if err := s.srv.ListenAndServe(); err != http.ErrServerClosed {
