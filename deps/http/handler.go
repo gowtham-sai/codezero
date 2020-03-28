@@ -13,7 +13,8 @@ type (
 		Sits Situations `yaml:"situations"`
 	}
 
-	Dependencies map[ServiceName]Dependency
+	Dependencies map[ServiceName]*Dependency
+	Scenario     map[ServiceName]map[SituationName]Spec
 )
 
 func (h *Handler) StopSituation(spec deps.Spec) error {
@@ -23,10 +24,28 @@ func (h *Handler) StopSituation(spec deps.Spec) error {
 func (h *Handler) StartSituation(spec deps.Spec) error {
 	panic("implement me")
 
+	return
+}
+
+func (h *Handler) StartSituation(spec deps.Spec) (err error) {
+	scenario, err := parseScenario(spec)
+	if err != nil {
+		return
+	}
+	for serviceName, situations := range scenario {
+		for situationName, scenarioSpec := range situations {
+			if dep, found := h.Deps[serviceName]; found {
+				if sit, found := dep.Sits[situationName]; found {
+					sit.StartSituation(scenarioSpec)
+				}
+			}
+		}
+	}
+	return
 }
 
 func (h *Handler) ParseSpec(spec deps.Spec) (err error) {
-	d, err := parseSpec(spec)
+	d, err := parseDependency(spec)
 	if err != nil {
 		return err
 	}
