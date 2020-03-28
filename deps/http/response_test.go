@@ -21,7 +21,7 @@ func TestCreateHandler(t *testing.T) {
 
 	handlerFunc(w, r)
 
-	assert.Equal(t, resp.StatusCode, w.Code)
+	assert.Equal(t, resp.StatusCode(), w.Code)
 	assert.Equal(t, []byte(resp.Body), w.Body.Bytes())
 	assert.Equal(t, resp.Headers["Accept-Encoding"], w.Header()["Accept-Encoding"])
 }
