@@ -17,12 +17,21 @@ type (
 	Scenario     map[ServiceName]map[SituationName]Spec
 )
 
-func (h *Handler) StopSituation(spec deps.Spec) error {
-	panic("implement me")
-}
+func (h *Handler) StopSituation(spec deps.Spec) (err error) {
+	scenario, err := parseScenario(spec)
+	if err != nil {
+		return
+	}
 
-func (h *Handler) StartSituation(spec deps.Spec) error {
-	panic("implement me")
+	for serviceName, situations := range scenario {
+		for situationName, _ := range situations {
+			if dep, found := h.Deps[serviceName]; found {
+				if sit, found := dep.Sits[situationName]; found {
+					sit.StopSituation()
+				}
+			}
+		}
+	}
 
 	return
 }

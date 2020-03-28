@@ -53,4 +53,62 @@ func TestHandler(t *testing.T) {
 			})
 		})
 	})
+
+	t.Run("stop situation", func(t *testing.T) {
+		h := &Handler{Deps: Dependencies{}}
+		h.ParseSpec(deps.Spec(serviceXYZSpec))
+		t.Run("situation should not be reachable", func(t *testing.T) {
+			startSituationErr := h.StartSituation(`
+service_xyz:
+  response_2xx:
+    port: 8010
+`)
+			assert.NoError(t, startSituationErr)
+			req, err := http.NewRequest(string(Get), fmt.Sprintf("http://localhost:%d/v1/ping", 8010), nil)
+			require.NoError(t, err)
+
+			resp, err := http.DefaultClient.Do(req)
+			require.NoError(t, err)
+			assert.Equal(t, h.Deps[testSVC].Sits[testSit2xx].Res.StatusCode(), resp.StatusCode)
+
+			h.StopSituation(`
+service_xyz:
+  response_2xx:
+    port: 8010
+`)
+			retriedRes, err := http.DefaultClient.Do(req)
+			require.Error(t, err)
+			assert.Nil(t, retriedRes)
+		})
+	})
+
+	t.Run("start situation", func(t *testing.T) {
+		h := &Handler{Deps: Dependencies{}}
+		h.ParseSpec(deps.Spec(serviceXYZSpec))
+		t.Run("should start a situation given a spec", func(t *testing.T) {
+			defer h.StopSituation(`
+service_xyz:
+  response_2xx:
+    port: 8010
+`)
+			startSituationErr := h.StartSituation(`
+service_xyz:
+  response_2xx:
+    port: 8010
+`)
+			assert.NoError(t, startSituationErr)
+			req, err := http.NewRequest(string(Get), fmt.Sprintf("http://localhost:%d/v1/ping", 8010), nil)
+			require.NoError(t, err)
+
+			resp, err := http.DefaultClient.Do(req)
+			require.NoError(t, err)
+			defer resp.Body.Close()
+			respBytes, err := ioutil.ReadAll(resp.Body)
+			require.NoError(t, err)
+
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			assert.Equal(t, h.Deps[testSVC].Sits[testSit2xx].Res.Headers["Accept-Encoding"], resp.Header["Accept-Encoding"])
+			assert.Equal(t, string(respBytes), fmt.Sprintf("%s\n", `{"ping": "pong"}`))
+		})
+	})
 }
