@@ -9,12 +9,12 @@ import (
 
 type (
 	SituationName string
-	Situations    map[SituationName]Situation
+	Situations    map[SituationName]*Situation
 
 	Situation struct {
-		Req Request  `yaml:"req"`
-		Res Response `yaml:"res"`
-		srv http.Server
+		Req *Request  `yaml:"req"`
+		Res *Response `yaml:"res"`
+		srv *http.Server
 	}
 
 	Spec struct {
@@ -29,17 +29,19 @@ func (s *Spec) Addr() string {
 func (s *Situation) StartSituation(spec Spec) {
 	handler := s.Res.createHandler()
 	http.HandleFunc(s.Req.Path, handler)
-	s.srv = http.Server{
+	s.srv = &http.Server{
 		Addr: spec.Addr(),
 	}
 	go func() {
-		err := s.srv.ListenAndServe()
-		if err != nil {
+		if err := s.srv.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("Failed to start situation: %+v", err)
 		}
 	}()
 }
 
-func (s *Situation) StopSituation() {
-	s.srv.Shutdown(context.Background())
+func (s *Situation) StopSituation() (err error) {
+	if s.srv != nil {
+		s.srv.Shutdown(context.Background())
+	}
+	return
 }

@@ -15,18 +15,23 @@ func TestSpecAddrShouldReturnPort(t *testing.T) {
 	assert.Equal(t, ":8010", s.Addr())
 }
 
+func TestStopSituation(t *testing.T) {
+	s := &Situation{}
+	assert.NotPanics(t, func(){s.StopSituation()})
+}
+
 func TestShouldStartSituation(t *testing.T) {
 	situation := Situation{
-		Req: Request{
+		Req: &Request{
 			Method:  Get,
 			Path:    "/v1/ping",
 			Query:   Query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
 			Headers: Header{"Accept-Encoding": []string{"gzip", "compress"}},
 		},
-		Res: Response{
-			StatusCode: http.StatusAccepted,
-			Body:       fmt.Sprintf("%s\n", `{"ping": "pong"}`),
-			Headers:    Header{"Accept-Encoding": []string{"application/json", "gzip"}},
+		Res: &Response{
+			Code:    http.StatusAccepted,
+			Body:    fmt.Sprintf("%s\n", `{"ping": "pong"}`),
+			Headers: Header{"Accept-Encoding": []string{"application/json", "gzip"}},
 		},
 	}
 	spec := Spec{Port: 8010}
