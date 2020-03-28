@@ -5,9 +5,9 @@ import (
 )
 
 type Response struct {
-	StatusCode int    `yaml:"status_code"`
-	Body       string `yaml:"body"`
-	Headers    Header `yaml:"headers"`
+	Code    int    `yaml:"status_code"`
+	Body    string `yaml:"body"`
+	Headers Header `yaml:"headers"`
 }
 
 func (resp *Response) createHandler() http.HandlerFunc {
@@ -15,8 +15,15 @@ func (resp *Response) createHandler() http.HandlerFunc {
 		for hKey, hValues := range resp.Headers {
 			w.Header()[hKey] = hValues
 		}
-		w.WriteHeader(resp.StatusCode)
+		w.WriteHeader(resp.StatusCode())
 		w.Write([]byte(resp.Body))
 	}
 	return responseWriter
+}
+
+func (resp *Response) StatusCode() int {
+	if resp.Code != 0 {
+		return resp.Code
+	}
+	return resp.Code
 }
