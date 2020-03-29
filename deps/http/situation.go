@@ -8,25 +8,25 @@ import (
 )
 
 type (
-	SituationName string
-	Situations    map[SituationName]*Situation
+	situationName string
+	situations    map[situationName]*situation
 
-	Situation struct {
-		Req *Request  `yaml:"req"`
-		Res *Response `yaml:"res"`
+	situation struct {
+		Req *request  `yaml:"req"`
+		Res *response `yaml:"res"`
 		srv *http.Server
 	}
 
-	Spec struct {
+	spec struct {
 		Port int `yaml:"port"`
 	}
 )
 
-func (s *Spec) Addr() string {
+func (s *spec) Addr() string {
 	return fmt.Sprintf(":%d", s.Port)
 }
 
-func (s *Situation) StartSituation(spec Spec) {
+func (s *situation) StartSituation(spec spec) {
 	mux := http.NewServeMux()
 	handler := s.Res.createHandler()
 	mux.HandleFunc(s.Req.Path, handler)
@@ -41,7 +41,7 @@ func (s *Situation) StartSituation(spec Spec) {
 	}()
 }
 
-func (s *Situation) StopSituation() (err error) {
+func (s *situation) StopSituation() (err error) {
 	if s.srv != nil {
 		s.srv.Shutdown(context.Background())
 	}

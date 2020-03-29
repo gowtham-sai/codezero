@@ -5,17 +5,17 @@ import (
 )
 
 const (
-	Type deps.Type = "http"
+	depType deps.Type = "http"
 
-	Get     Method = "GET"
-	Head    Method = "HEAD"
-	Post    Method = "POST"
-	Put     Method = "PUT"
-	Patch   Method = "PATCH" // RFC 5789
-	Delete  Method = "DELETE"
-	Connect Method = "CONNECT"
-	Options Method = "OPTIONS"
-	Trace   Method = "TRACE"
+	methodGet     method = "GET"
+	methodHead    method = "HEAD"
+	methodPost    method = "POST"
+	methodPut     method = "PUT"
+	methodPatch   method = "PATCH" // RFC 5789
+	methodDelete  method = "DELETE"
+	methodConnect method = "CONNECT"
+	methodOptions method = "OPTIONS"
+	methodTrace   method = "TRACE"
 )
 
 var (
@@ -23,13 +23,13 @@ var (
 )
 
 type (
-	ServiceName string
+	serviceName string
 
-	Method string
-	Header map[string][]string
-	Query  map[string]string
+	method string
+	header map[string][]string
+	query  map[string]string
 )
 
 func init() {
-	deps.RegisterHandler(Type, registeredDependencies)
+	deps.RegisterHandler(depType, registeredDependencies)
 }

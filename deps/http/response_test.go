@@ -9,10 +9,10 @@ import (
 )
 
 func TestCreateHandler(t *testing.T) {
-	resp := &Response{
+	resp := &response{
 		Code:    http.StatusAccepted,
 		Body:    `{"ping": "pong"}`,
-		Headers: Header{"Accept-Encoding": []string{"application/json", "gzip"}},
+		Headers: header{"Accept-Encoding": []string{"application/json", "gzip"}},
 	}
 	handlerFunc := resp.createHandler()
 
@@ -28,14 +28,14 @@ func TestCreateHandler(t *testing.T) {
 
 func TestStatusCode(t *testing.T) {
 	t.Run("when status code is not given", func(t *testing.T) {
-		resp := &Response{}
+		resp := &response{}
 		t.Run("should return StatusOK as default code", func(t *testing.T) {
 			assert.Equal(t, http.StatusOK, resp.StatusCode())
 		})
 	})
 
 	t.Run("when status code is given", func(t *testing.T) {
-		resp := &Response{Code: http.StatusAccepted}
+		resp := &response{Code: http.StatusAccepted}
 		t.Run("should return given status code", func(t *testing.T) {
 			assert.Equal(t, http.StatusAccepted, resp.StatusCode())
 		})

@@ -21,15 +21,15 @@ func TestParseDependency(t *testing.T) {
 	expectedHandler := handler{
 		Deps: dependencies{
 			"service_xyz": &dependency{
-				Sits: Situations{
-					"response_2xx": &Situation{
-						Req: &Request{
-							Method:  Get,
+				Sits: situations{
+					"response_2xx": &situation{
+						Req: &request{
+							Method:  methodGet,
 							Path:    "/v1/ping",
-							Query:   Query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
-							Headers: Header{"Accept-Encoding": []string{"gzip", "compress"}},
+							Query:   query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
+							Headers: header{"Accept-Encoding": []string{"gzip", "compress"}},
 						},
-						Res: &Response{
+						Res: &response{
 							Body: fmt.Sprintf("%s\n", `{"ping": "pong"}`),
 						},
 					},
@@ -48,6 +48,6 @@ service_xyz:
 `)
 	require.NoError(t, err)
 
-	expectedScenario := scenario{"service_xyz": map[SituationName]Spec{"response_2xx": {Port: 8010}}}
+	expectedScenario := scenario{"service_xyz": map[situationName]spec{"response_2xx": {Port: 8010}}}
 	assert.Equal(t, expectedScenario, actualScenario)
 }

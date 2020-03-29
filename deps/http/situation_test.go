@@ -11,34 +11,34 @@ import (
 )
 
 func TestSpecAddrShouldReturnPort(t *testing.T) {
-	s := Spec{Port: 8010}
+	s := spec{Port: 8010}
 	assert.Equal(t, ":8010", s.Addr())
 }
 
 func TestStopSituation(t *testing.T) {
-	s := &Situation{}
-	assert.NotPanics(t, func(){s.StopSituation()})
+	s := &situation{}
+	assert.NotPanics(t, func() { s.StopSituation() })
 }
 
 func TestShouldStartSituation(t *testing.T) {
-	situation := Situation{
-		Req: &Request{
-			Method:  Get,
+	situation := situation{
+		Req: &request{
+			Method:  methodGet,
 			Path:    "/v1/ping",
-			Query:   Query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
-			Headers: Header{"Accept-Encoding": []string{"gzip", "compress"}},
+			Query:   query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
+			Headers: header{"Accept-Encoding": []string{"gzip", "compress"}},
 		},
-		Res: &Response{
+		Res: &response{
 			Code:    http.StatusAccepted,
 			Body:    fmt.Sprintf("%s\n", `{"ping": "pong"}`),
-			Headers: Header{"Accept-Encoding": []string{"application/json", "gzip"}},
+			Headers: header{"Accept-Encoding": []string{"application/json", "gzip"}},
 		},
 	}
-	spec := Spec{Port: 8010}
+	spec := spec{Port: 8010}
 	situation.StartSituation(spec)
 	defer situation.StopSituation()
 
-	req, err := http.NewRequest(string(Get), fmt.Sprintf("http://localhost:%d/v1/ping", spec.Port), nil)
+	req, err := http.NewRequest(string(methodGet), fmt.Sprintf("http://localhost:%d/v1/ping", spec.Port), nil)
 	require.NoError(t, err)
 
 	resp, err := http.DefaultClient.Do(req)

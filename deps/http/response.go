@@ -4,13 +4,13 @@ import (
 	"net/http"
 )
 
-type Response struct {
+type response struct {
 	Code    int    `yaml:"status_code"`
 	Body    string `yaml:"body"`
-	Headers Header `yaml:"headers"`
+	Headers header `yaml:"headers"`
 }
 
-func (resp *Response) createHandler() http.HandlerFunc {
+func (resp *response) createHandler() http.HandlerFunc {
 	responseWriter := func(w http.ResponseWriter, r *http.Request) {
 		for hKey, hValues := range resp.Headers {
 			w.Header()[hKey] = hValues
@@ -21,7 +21,7 @@ func (resp *Response) createHandler() http.HandlerFunc {
 	return responseWriter
 }
 
-func (resp *Response) StatusCode() int {
+func (resp *response) StatusCode() int {
 	if resp.Code != 0 {
 		return resp.Code
 	}

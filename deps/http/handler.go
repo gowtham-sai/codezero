@@ -10,11 +10,11 @@ type (
 	}
 
 	dependency struct {
-		Sits Situations `yaml:"situations"`
+		Sits situations `yaml:"situations"`
 	}
 
-	dependencies map[ServiceName]*dependency
-	scenario     map[ServiceName]map[SituationName]Spec
+	dependencies map[serviceName]*dependency
+	scenario     map[serviceName]map[situationName]spec
 )
 
 func (h *handler) StopSituation(spec deps.Spec) (err error) {

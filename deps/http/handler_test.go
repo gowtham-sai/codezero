@@ -13,14 +13,14 @@ import (
 )
 
 func TestHandler(t *testing.T) {
-	testSVC := ServiceName("service_xyz")
-	testSit2xx := SituationName("response_2xx")
+	testSVC := serviceName("service_xyz")
+	testSit2xx := situationName("response_2xx")
 	serviceXYZSpec, err := ioutil.ReadFile("../../fixtures/deps/http/service_xyz.yml")
 	require.NoError(t, err, "yamlFile.Get error")
 
 	t.Run("parse spec", func(t *testing.T) {
 		t.Run("if service name already present", func(t *testing.T) {
-			h := &handler{Deps: dependencies{testSVC: &dependency{Sits: Situations{testSit2xx: &Situation{}}}}}
+			h := &handler{Deps: dependencies{testSVC: &dependency{Sits: situations{testSit2xx: &situation{}}}}}
 			t.Run("should append situations", func(t *testing.T) {
 				spec, err := ioutil.ReadFile("../../fixtures/deps/http/service_xyz_response_5xx.yml")
 				require.NoError(t, err, "yamlFile.Get error")
@@ -36,15 +36,15 @@ func TestHandler(t *testing.T) {
 				h.ParseSpec(deps.Spec(serviceXYZSpec))
 
 				assert.Equal(t, &dependency{
-					Sits: Situations{
-						testSit2xx: &Situation{
-							Req: &Request{
-								Method:  Get,
+					Sits: situations{
+						testSit2xx: &situation{
+							Req: &request{
+								Method:  methodGet,
 								Path:    "/v1/ping",
-								Query:   Query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
-								Headers: Header{"Accept-Encoding": []string{"gzip", "compress"}},
+								Query:   query{"waypoints": "102.6123,-6.1235|102.113,-6.2343"},
+								Headers: header{"Accept-Encoding": []string{"gzip", "compress"}},
 							},
-							Res: &Response{
+							Res: &response{
 								Body: fmt.Sprintf("%s\n", `{"ping": "pong"}`),
 							},
 						},
@@ -64,7 +64,7 @@ service_xyz:
     port: 8010
 `)
 			assert.NoError(t, startSituationErr)
-			req, err := http.NewRequest(string(Get), fmt.Sprintf("http://localhost:%d/v1/ping", 8010), nil)
+			req, err := http.NewRequest(string(methodGet), fmt.Sprintf("http://localhost:%d/v1/ping", 8010), nil)
 			require.NoError(t, err)
 
 			resp, err := http.DefaultClient.Do(req)
@@ -97,7 +97,7 @@ service_xyz:
     port: 8010
 `)
 			assert.NoError(t, startSituationErr)
-			req, err := http.NewRequest(string(Get), fmt.Sprintf("http://localhost:%d/v1/ping", 8010), nil)
+			req, err := http.NewRequest(string(methodGet), fmt.Sprintf("http://localhost:%d/v1/ping", 8010), nil)
 			require.NoError(t, err)
 
 			resp, err := http.DefaultClient.Do(req)
