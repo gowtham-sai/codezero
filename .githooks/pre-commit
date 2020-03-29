@@ -1,0 +1,78 @@
+#!/bin/sh
+
+STAGED_GO_FILES=$(git diff --cached --name-status --diff-filter d -- '*.go' | awk '{ print $2 }')
+
+if [[ "$STAGED_GO_FILES" = "" ]]; then
+  exit 0
+fi
+
+GOLINT=$GOPATH/bin/golint
+GOIMPORTS=$GOPATH/bin/goimports
+GOTEST=$GOPATH/bin/gotestsum
+
+# Check for golint
+if [[ ! -x "$GOLINT" ]]; then
+  printf "\t\033[41mPlease install golint\033[0m (go get -u golang.org/x/lint/golint)"
+  exit 1
+fi
+
+# Check for goimports
+if [[ ! -x "$GOIMPORTS" ]]; then
+  printf "\t\033[41mPlease install goimports\033[0m (go get golang.org/x/tools/cmd/goimports)"
+  exit 1
+fi
+
+PASS=true
+
+for FILE in $STAGED_GO_FILES
+do
+  # Run goimports on the staged file
+  printf "\n\033[1mGoImports:\033[0m\n"
+  $GOIMPORTS -w $FILE
+  printf "\t\033[32m[✓] $FILE\033[0m\n"
+done
+
+for FILE in $STAGED_GO_FILES
+do
+  # Run golint on the staged file and check the exit status
+  printf "\n\033[1mLint:\033[0m\n"
+  $GOLINT "-set_exit_status" $FILE
+  if [[ $? == 1 ]]; then
+    printf "\t\033[31m[𐄂] $FILE\033[0m\n"
+    PASS=false
+  else
+    printf "\t\033[32m[✓] $FILE\033[0m\n"
+  fi
+done
+
+for FILE in $STAGED_GO_FILES
+do
+  # Run govet on the staged file and check the exit status
+  printf "\n\033[1mVet:\033[0m\n"
+  go vet $FILE
+  if [[ $? != 0 ]]; then
+    printf "\t\033[31m[𐄂] $FILE\033[0m\n"
+    PASS=false
+  else
+    printf "\t\033[32m[✓] $FILE\033[0m\n"
+  fi
+done
+
+printf "\n\033[1mTest:\033[0m\n"
+testoutput=$($GOTEST --format short-verbose)
+if [[ $? != 0 ]]; then
+  echo "$testoutput" | grep "^FAIL\|^DONE"| sed "s/FAIL/\\\033[31m[𐄂]/" | sed "s/$/\\\033[0m/g;" | awk '{print "\t"$0}'  | xargs -0 printf
+  PASS=false
+else
+  echo "$testoutput" | grep "^PASS\|^DONE" | sed "s/\.Test.*.\$//" | uniq |sed "s/PASS/\\\033[32m[✓]/" | sed "s/$/\\\033[0m/g;" | awk '{print "\t"$0}' | xargs -0 printf
+fi
+
+printf "\n\033[1mPreChecks:\033[0m\n"
+if ! $PASS; then
+  printf "\t\033[31m[𐄂] Failed\033[0m\n"
+  exit 1
+else
+  printf "\t\033[32m[✓] Succeeded\033[0m\n"
+fi
+
+exit 0

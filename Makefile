@@ -5,11 +5,13 @@ default: check-quality test build
 
 ALL_PACKAGES=$(shell go list ./... | grep -v /vendor)
 WORKDIR=$(shell echo "${PWD}")
-APPLICATION_YAML=$(shell echo "$(WORKDIR)/application.yml")
 APP_EXECUTABLE="out/codezero"
 
 setup:
+	rm -r "$$PWD/.git/hooks"
+	ln -s "$$PWD/.githooks" "$$PWD/.git/hooks"
 	go get -u golang.org/x/lint/golint
+	go get gotest.tools/gotestsum
 
 check-quality: lint vet
 
