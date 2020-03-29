@@ -24,18 +24,18 @@ fi
 
 PASS=true
 
+printf "\n\033[1mGoImports:\033[0m\n"
 for FILE in $STAGED_GO_FILES
 do
   # Run goimports on the staged file
-  printf "\n\033[1mGoImports:\033[0m\n"
   $GOIMPORTS -w $FILE
   printf "\t\033[32m[✓] $FILE\033[0m\n"
 done
 
+printf "\n\033[1mLint:\033[0m\n"
 for FILE in $STAGED_GO_FILES
 do
   # Run golint on the staged file and check the exit status
-  printf "\n\033[1mLint:\033[0m\n"
   $GOLINT "-set_exit_status" $FILE
   if [[ $? == 1 ]]; then
     printf "\t\033[31m[𐄂] $FILE\033[0m\n"
