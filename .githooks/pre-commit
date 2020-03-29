@@ -45,18 +45,16 @@ do
   fi
 done
 
-for FILE in $STAGED_GO_FILES
-do
-  # Run govet on the staged file and check the exit status
-  printf "\n\033[1mVet:\033[0m\n"
-  go vet $FILE
-  if [[ $? != 0 ]]; then
-    printf "\t\033[31m[𐄂] $FILE\033[0m\n"
-    PASS=false
-  else
-    printf "\t\033[32m[✓] $FILE\033[0m\n"
-  fi
-done
+
+# Run govet on the staged file and check the exit status
+printf "\n\033[1mVet:\033[0m\n"
+go vet `git rev-parse --show-toplevel`/...
+if [[ $? != 0 ]]; then
+  printf "\t\033[31m[𐄂] Failed\033[0m\n"
+  PASS=false
+else
+  printf "\t\033[32m[✓] Succeeded\033[0m\n"
+fi
 
 printf "\n\033[1mTest:\033[0m\n"
 testoutput=$($GOTEST --format short-verbose)
