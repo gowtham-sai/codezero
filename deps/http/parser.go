@@ -6,12 +6,12 @@ import (
 	"codezero/deps"
 )
 
-func parseDependency(spec deps.Spec) (d Dependencies, err error) {
+func parseDependency(spec deps.Spec) (d dependencies, err error) {
 	err = yaml.Unmarshal([]byte(spec), &d)
 	return
 }
 
-func parseScenario(spec deps.Spec) (s Scenario, err error) {
+func parseScenario(spec deps.Spec) (s scenario, err error) {
 	err = yaml.Unmarshal([]byte(spec), &s)
 	return
 }

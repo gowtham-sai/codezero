@@ -5,26 +5,26 @@ import (
 )
 
 type (
-	Handler struct {
-		Deps Dependencies
+	handler struct {
+		Deps dependencies
 	}
 
-	Dependency struct {
+	dependency struct {
 		Sits Situations `yaml:"situations"`
 	}
 
-	Dependencies map[ServiceName]*Dependency
-	Scenario     map[ServiceName]map[SituationName]Spec
+	dependencies map[ServiceName]*dependency
+	scenario     map[ServiceName]map[SituationName]Spec
 )
 
-func (h *Handler) StopSituation(spec deps.Spec) (err error) {
+func (h *handler) StopSituation(spec deps.Spec) (err error) {
 	scenario, err := parseScenario(spec)
 	if err != nil {
 		return
 	}
 
 	for serviceName, situations := range scenario {
-		for situationName, _ := range situations {
+		for situationName := range situations {
 			if dep, found := h.Deps[serviceName]; found {
 				if sit, found := dep.Sits[situationName]; found {
 					sit.StopSituation()
@@ -36,7 +36,7 @@ func (h *Handler) StopSituation(spec deps.Spec) (err error) {
 	return
 }
 
-func (h *Handler) StartSituation(spec deps.Spec) (err error) {
+func (h *handler) StartSituation(spec deps.Spec) (err error) {
 	scenario, err := parseScenario(spec)
 	if err != nil {
 		return
@@ -53,7 +53,7 @@ func (h *Handler) StartSituation(spec deps.Spec) (err error) {
 	return
 }
 
-func (h *Handler) ParseSpec(spec deps.Spec) (err error) {
+func (h *handler) ParseSpec(spec deps.Spec) (err error) {
 	d, err := parseDependency(spec)
 	if err != nil {
 		return err

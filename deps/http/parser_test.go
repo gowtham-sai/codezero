@@ -18,9 +18,9 @@ func TestParseDependency(t *testing.T) {
 	actualHandler, err := parseDependency(deps.Spec(spec))
 	require.NoError(t, err, "http.parseDependency error")
 
-	expectedHandler := Handler{
-		Deps: Dependencies{
-			"service_xyz": &Dependency{
+	expectedHandler := handler{
+		Deps: dependencies{
+			"service_xyz": &dependency{
 				Sits: Situations{
 					"response_2xx": &Situation{
 						Req: &Request{
@@ -48,6 +48,6 @@ service_xyz:
 `)
 	require.NoError(t, err)
 
-	expectedScenario := Scenario{"service_xyz": map[SituationName]Spec{"response_2xx": {Port: 8010}}}
+	expectedScenario := scenario{"service_xyz": map[SituationName]Spec{"response_2xx": {Port: 8010}}}
 	assert.Equal(t, expectedScenario, actualScenario)
 }

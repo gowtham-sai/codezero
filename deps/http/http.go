@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	registeredDependencies = &Handler{}
+	registeredDependencies = &handler{}
 )
 
 type (

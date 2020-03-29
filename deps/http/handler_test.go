@@ -20,7 +20,7 @@ func TestHandler(t *testing.T) {
 
 	t.Run("parse spec", func(t *testing.T) {
 		t.Run("if service name already present", func(t *testing.T) {
-			h := &Handler{Deps: Dependencies{testSVC: &Dependency{Sits: Situations{testSit2xx: &Situation{}}}}}
+			h := &handler{Deps: dependencies{testSVC: &dependency{Sits: Situations{testSit2xx: &Situation{}}}}}
 			t.Run("should append situations", func(t *testing.T) {
 				spec, err := ioutil.ReadFile("../../fixtures/deps/http/service_xyz_response_5xx.yml")
 				require.NoError(t, err, "yamlFile.Get error")
@@ -32,10 +32,10 @@ func TestHandler(t *testing.T) {
 
 		t.Run("if service name not present", func(t *testing.T) {
 			t.Run("should store situations", func(t *testing.T) {
-				h := &Handler{Deps: Dependencies{}}
+				h := &handler{Deps: dependencies{}}
 				h.ParseSpec(deps.Spec(serviceXYZSpec))
 
-				assert.Equal(t, &Dependency{
+				assert.Equal(t, &dependency{
 					Sits: Situations{
 						testSit2xx: &Situation{
 							Req: &Request{
@@ -55,7 +55,7 @@ func TestHandler(t *testing.T) {
 	})
 
 	t.Run("stop situation", func(t *testing.T) {
-		h := &Handler{Deps: Dependencies{}}
+		h := &handler{Deps: dependencies{}}
 		h.ParseSpec(deps.Spec(serviceXYZSpec))
 		t.Run("situation should not be reachable", func(t *testing.T) {
 			startSituationErr := h.StartSituation(`
@@ -83,7 +83,7 @@ service_xyz:
 	})
 
 	t.Run("start situation", func(t *testing.T) {
-		h := &Handler{Deps: Dependencies{}}
+		h := &handler{Deps: dependencies{}}
 		h.ParseSpec(deps.Spec(serviceXYZSpec))
 		t.Run("should start a situation given a spec", func(t *testing.T) {
 			defer h.StopSituation(`
