@@ -62,7 +62,7 @@ if [[ $? != 0 ]]; then
   echo "$testoutput" | grep "^FAIL\|^DONE"| sed "s/FAIL/\\\033[31m[𐄂]/" | sed "s/$/\\\033[0m/g;" | awk '{print "\t"$0}'  | xargs -0 printf
   PASS=false
 else
-  echo "$testoutput" | grep "^PASS\|^DONE" | sed "s/\.Test.*.\$//" |  sed "s/ (cached)//" | sort -u |sed "s/PASS/\\\033[32m[✓]/" | sed "s/$/\\\033[0m/g;" | awk '{print "\t"$0}' | xargs -0 printf
+  echo "$testoutput" | grep "^PASS\|^DONE" | sed "s/\.Test.*.\$//" |  sed "s/ (cached)//" | awk \!'x[$0]++' |sed "s/PASS/\\\033[32m[✓]/" | sed "s/$/\\\033[0m/g;" | awk '{print "\t"$0}' | xargs -0 printf
 fi
 
 printf "\n\033[1mPreChecks:\033[0m\n"
