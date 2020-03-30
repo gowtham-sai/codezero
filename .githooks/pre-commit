@@ -2,75 +2,28 @@
 
 STAGED_GO_FILES=$(git diff --cached --name-status --diff-filter d -- '*.go' | awk '{ print $2 }')
 
-if [[ "$STAGED_GO_FILES" = "" ]]; then
-  exit 0
-fi
+STASH_NAME="pre-commit-$(date +%s)"
+git stash save -q -k --keep-index $STASH_NAME
 
-GOLINT=$GOPATH/bin/golint
-GOIMPORTS=$GOPATH/bin/goimports
-GOTEST=$GOPATH/bin/gotestsum
+$PWD/.githooks/lint
+LINTSTATUS=$?
 
-# Check for golint
-if [[ ! -x "$GOLINT" ]]; then
-  printf "\t\033[41mPlease install golint\033[0m (go get -u golang.org/x/lint/golint)"
+$PWD/.githooks/imports
+IMPORTSTATUS=$?
+
+$PWD/.githooks/vet
+VETSTATUS=$?
+
+$PWD/.githooks/tests
+TESTSTATUS=$?
+
+git checkout -- .
+git stash pop -q $(git stash list | grep $STASH_NAME | cut -d: -f1)
+
+printf "\n`tput bold`PreChecks:`tput sgr0`\n"
+if [[ $LINTSTATUS != 0 || $IMPORTSTATUS != 0 || $TESTSTATUS != 0 || $VETSTATUS != 0 ]]; then
+  printf "\t`tput setaf 1`[𐄂] Failed`tput sgr0`\n"
   exit 1
 fi
-
-# Check for goimports
-if [[ ! -x "$GOIMPORTS" ]]; then
-  printf "\t\033[41mPlease install goimports\033[0m (go get golang.org/x/tools/cmd/goimports)"
-  exit 1
-fi
-
-PASS=true
-
-printf "\n\033[1mGoImports:\033[0m\n"
-for FILE in $STAGED_GO_FILES
-do
-  # Run goimports on the staged file
-  $GOIMPORTS -w $FILE
-  printf "\t\033[32m[✓] $FILE\033[0m\n"
-done
-
-printf "\n\033[1mLint:\033[0m\n"
-for FILE in $STAGED_GO_FILES
-do
-  # Run golint on the staged file and check the exit status
-  $GOLINT "-set_exit_status" $FILE
-  if [[ $? == 1 ]]; then
-    printf "\t\033[31m[𐄂] $FILE\033[0m\n"
-    PASS=false
-  else
-    printf "\t\033[32m[✓] $FILE\033[0m\n"
-  fi
-done
-
-
-# Run govet on the staged file and check the exit status
-printf "\n\033[1mVet:\033[0m\n"
-go vet `git rev-parse --show-toplevel`/...
-if [[ $? != 0 ]]; then
-  printf "\t\033[31m[𐄂] Failed\033[0m\n"
-  PASS=false
-else
-  printf "\t\033[32m[✓] Succeeded\033[0m\n"
-fi
-
-printf "\n\033[1mTest:\033[0m\n"
-testoutput=$($GOTEST --format short-verbose)
-if [[ $? != 0 ]]; then
-  echo "$testoutput" | grep "^FAIL\|^DONE"| sed "s/FAIL/\\\033[31m[𐄂]/" | sed "s/$/\\\033[0m/g;" | awk '{print "\t"$0}'  | xargs -0 printf
-  PASS=false
-else
-  echo "$testoutput" | grep "^PASS\|^DONE" | sed "s/\.Test.*.\$//" |  sed "s/ (cached)//" | awk \!'x[$0]++' |sed "s/PASS/\\\033[32m[✓]/" | sed "s/$/\\\033[0m/g;" | awk '{print "\t"$0}' | xargs -0 printf
-fi
-
-printf "\n\033[1mPreChecks:\033[0m\n"
-if ! $PASS; then
-  printf "\t\033[31m[𐄂] Failed\033[0m\n"
-  exit 1
-else
-  printf "\t\033[32m[✓] Succeeded\033[0m\n"
-fi
-
+printf "\t`tput setaf 2`[✓] Succeeded`tput sgr0`\n"
 exit 0

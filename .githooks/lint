@@ -1,0 +1,33 @@
+#!/bin/sh
+
+STAGED_GO_FILES=$(git diff --cached --name-status --diff-filter d -- '*.go' | awk '{ print $2 }')
+if [[ "$STAGED_GO_FILES" = "" ]]; then
+  exit 0
+fi
+
+GOLINT=$GOPATH/bin/golint
+
+# Check for golint
+if [[ ! -x "$GOLINT" ]]; then
+  printf "\t`tput bold`Please install golint`tput sgr0` (go get -u golang.org/x/lint/golint) or run make setup"
+  exit 1
+fi
+
+printf "\n`tput bold`Lint:`tput sgr0`\n"
+for FILE in $STAGED_GO_FILES
+do
+  # Run golint on the staged file and check the exit status
+  $GOLINT "-set_exit_status" $FILE
+  if [[ $? == 1 ]]; then
+    printf "\t`tput setaf 1`[𐄂] $FILE`tput sgr0`\n"
+    PASS=false
+  else
+    printf "\t`tput setaf 2`[✓] $FILE`tput sgr0`\n"
+  fi
+done
+
+if ! $PASS; then
+  exit 1
+fi
+
+exit 0

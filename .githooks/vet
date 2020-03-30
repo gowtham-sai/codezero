@@ -1,0 +1,19 @@
+#!/bin/sh
+
+PASS=true
+
+# Run govet on the staged file and check the exit status
+printf "\n`tput bold`Vet:`tput sgr0`\n"
+go vet `git rev-parse --show-toplevel`/...
+if [[ $? != 0 ]]; then
+  printf "\t`tput setaf 1`[𐄂] Failed`tput sgr0`\n"
+  PASS=false
+else
+  printf "\t`tput setaf 2`[✓] Succeeded`tput sgr0`\n"
+fi
+
+if ! $PASS; then
+  exit 1
+fi
+
+exit 0
