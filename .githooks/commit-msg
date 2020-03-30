@@ -1,0 +1,6 @@
+#!/bin/sh
+
+echo "\n\n---" >> $1
+echo "Auto Added" >> $1
+
+$PWD/.githooks/pre-commit >> $1

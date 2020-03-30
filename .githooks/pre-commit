@@ -26,4 +26,5 @@ if [[ $LINTSTATUS != 0 || $IMPORTSTATUS != 0 || $TESTSTATUS != 0 || $VETSTATUS !
   exit 1
 fi
 printf "\t`tput setaf 2`[✓] Succeeded`tput sgr0`\n"
+printf "\n"
 exit 0
