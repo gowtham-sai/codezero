@@ -7,22 +7,31 @@ ALL_PACKAGES=$(shell go list ./... | grep -v /vendor)
 WORKDIR=$(shell echo "${PWD}")
 APP_EXECUTABLE="out/codezero"
 
-setup:
-	rm -r "$$PWD/.git/hooks"
-	ln -s "$$PWD/.githooks" "$$PWD/.git/hooks"
+setup: --setup-git-hooks
 	go get -u golang.org/x/lint/golint
 	go get gotest.tools/gotestsum
 
-check-quality: lint vet
+--setup-git-hooks:
+	@if [ -d "$$PWD/.git/hooks" ]; then \
+	  if [ -L "$$PWD/.git/hooks" ]; then \
+		rm "$$PWD/.git/hooks"; \
+	  else \
+		rm -rf "$$PWD/.git/hooks"; \
+	  fi \
+	fi
+	ln -s "$$PWD/.githooks" "$$PWD/.git/hooks"
 
-lint:
+
+check-quality: --lint --vet
+
+--lint:
 	@echo "Running Lint ...."
 	@if [[ `golint $(ALL_PACKAGES) | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; } | wc -l | tr -d ' '` -ne 0 ]]; then \
           golint $(ALL_PACKAGES) | { grep -vwE "exported (var|function|method|type|const) \S+ should have comment" || true; }; \
           exit 2; \
     fi;
 
-vet:
+--vet:
 	@echo "Running Vet checks ...."
 	@go vet ./...
 
