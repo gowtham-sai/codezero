@@ -23,7 +23,7 @@ do
   FILECHANGED=$(git --no-pager diff --name-only $FILE | wc -l | awk '{print $1}')
   if [[ $FILECHANGED != 0 ]]; then
     printf "needs following changes\n"
-    printf "`git --no-pager diff --unified=0 $FILE | tail +6`\n"
+    printf "%s\n" "`git --no-pager diff --unified=0 $FILE | tail +6`"
     printf "\t`tput setaf 1`[𐄂] $FILE`tput sgr0`\n"
     git checkout -q $FILE
     PASS=false
