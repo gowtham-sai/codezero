@@ -17,6 +17,26 @@ type (
 	scenario     map[serviceName]map[situationName]spec
 )
 
+// StartSituation starts the situation for http dependency
+func (h *handler) StartSituation(spec deps.Spec) (err error) {
+	scenario, err := parseScenario(spec)
+	if err != nil {
+		return
+	}
+
+	for serviceName, situations := range scenario {
+		for situationName, scenarioSpec := range situations {
+			if dep, found := h.Deps[serviceName]; found {
+				if sit, found := dep.Sits[situationName]; found {
+					sit.StartSituation(scenarioSpec)
+				}
+			}
+		}
+	}
+	return
+}
+
+// StopSituation starts the situation for http dependency
 func (h *handler) StopSituation(spec deps.Spec) (err error) {
 	scenario, err := parseScenario(spec)
 	if err != nil {
@@ -32,27 +52,10 @@ func (h *handler) StopSituation(spec deps.Spec) (err error) {
 			}
 		}
 	}
-
 	return
 }
 
-func (h *handler) StartSituation(spec deps.Spec) (err error) {
-	scenario, err := parseScenario(spec)
-	if err != nil {
-		return
-	}
-	for serviceName, situations := range scenario {
-		for situationName, scenarioSpec := range situations {
-			if dep, found := h.Deps[serviceName]; found {
-				if sit, found := dep.Sits[situationName]; found {
-					sit.StartSituation(scenarioSpec)
-				}
-			}
-		}
-	}
-	return
-}
-
+// ParseSpec starts the situation for http dependency
 func (h *handler) ParseSpec(spec deps.Spec) (err error) {
 	d, err := parseDependency(spec)
 	if err != nil {
